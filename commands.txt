@@ -1,0 +1,20 @@
+docker network create bde
+docker-compose up --build
+
+docker cp C:\BigDataTemp\crimes_1gb.csv namenode:/data
+docker exec -it namenode bash
+hdfs dfs -mkdir /data
+hdfs dfs -put /data/crimes_1gb.csv /data
+
+http://localhost:9870/explorer.html#/data -> podaci (namenode)
+http://localhost:8070/ -> spark master
+
+docker run --net bde -e SPARK_APPLICATION_ARGS="crime_count local filter-count 2020 THEFT"  bde/spark-app
+docker run --net bde  -e SPARK_APPLICATION_ARGS="crime_count spark filter-count 2020 THEFT" bde/spark-app
+docker run --net bde -e SPARK_APPLICATION_ARGS="crime_count local filter-count 2023 BATTERY"  bde/spark-app
+docker run --net bde  -e SPARK_APPLICATION_ARGS="crime_count spark filter-count 2023 BATTERY" bde/spark-app
+
+docker run --net bde -e SPARK_APPLICATION_ARGS="crime_stats local stats-by District Latitude" bde/spark-app
+docker run --net bde -e SPARK_APPLICATION_ARGS="crime_stats spark stats-by District Latitude" bde/spark-app
+docker run --net bde -e SPARK_APPLICATION_ARGS="crime_stats local stats-by District Longitude" bde/spark-app
+docker run --net bde -e SPARK_APPLICATION_ARGS="crime_stats spark stats-by District Longitude" bde/spark-app
